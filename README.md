@@ -1,42 +1,65 @@
 
 # Rapport
 
-**Skriv din rapport här!**
+Uppgift 2 utgår på att lägga till WebView i appen. Det ska gå att klicka i menyn och välja från vilken källa man vill visa sidan från (external or internal).
 
-_Du kan ta bort all text som finns sedan tidigare_.
+Det första steget var att “forka” filer som ska användas som bas från GitHub och byta namn i strings.xml.
 
-## Följande grundsyn gäller dugga-svar:
+    <string name="app_name">B22DANSA WebView App</string>
 
-- Ett kortfattat svar är att föredra. Svar som är längre än en sida text (skärmdumpar och programkod exkluderat) är onödigt långt.
-- Svaret skall ha minst en snutt programkod.
-- Svaret skall inkludera en kort övergripande förklarande text som redogör för vad respektive snutt programkod gör eller som svarar på annan teorifråga.
-- Svaret skall ha minst en skärmdump. Skärmdumpar skall illustrera exekvering av relevant programkod. Eventuell text i skärmdumpar måste vara läsbar.
-- I de fall detta efterfrågas, dela upp delar av ditt svar i för- och nackdelar. Dina för- respektive nackdelar skall vara i form av punktlistor med kortare stycken (3-4 meningar).
+Nästa steg var att tillåta internetuppkoppling för att senare ladda sidor från nätet.
+Ändringar i AndroidManifest.xml
 
-Programkod ska se ut som exemplet nedan. Koden måste vara korrekt indenterad då den blir lättare att läsa vilket gör det lättare att hitta syntaktiska fel.
+      <uses-permission android:name="android.permission.INTERNET" />
 
-```
-function errorCallback(error) {
-    switch(error.code) {
-        case error.PERMISSION_DENIED:
-            // Geolocation API stöds inte, gör något
-            break;
-        case error.POSITION_UNAVAILABLE:
-            // Misslyckat positionsanrop, gör något
-            break;
-        case error.UNKNOWN_ERROR:
-            // Okänt fel, gör något
-            break;
+WebView element läggs till i activity_main.xml och ID
+
+      android:id="@+id/my_webview"
+
+För att visa upp sidor på WebView var en del kod tillagd i MainActivity.java.
+I “onCreate” metod var web client skapad samt JS får tillåtelse att köras.
+
+    public void showExternalWebPage(){
+        myWebView.loadUrl("https://his.se"); // Laddar sidan från nätet
     }
-}
-```
 
-Bilder läggs i samma mapp som markdown-filen.
+    public void showInternalWebPage(){
+        myWebView.loadUrl("file:///android_asset/internal.html"); // Laddar sidan från "assets" map vilken är "internal"
+    }
 
-![](android.png)
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        .....
+        myWebView = findViewById(R.id.my_webview);
+        myWebView.setWebViewClient(new WebViewClient());
+        myWebView.getSettings().setJavaScriptEnabled(true);
 
-Läs gärna:
 
-- Boulos, M.N.K., Warren, J., Gong, J. & Yue, P. (2010) Web GIS in practice VIII: HTML5 and the canvas element for interactive online mapping. International journal of health geographics 9, 14. Shin, Y. &
-- Wunsche, B.C. (2013) A smartphone-based golf simulation exercise game for supporting arthritis patients. 2013 28th International Conference of Image and Vision Computing New Zealand (IVCNZ), IEEE, pp. 459–464.
-- Wohlin, C., Runeson, P., Höst, M., Ohlsson, M.C., Regnell, B., Wesslén, A. (2012) Experimentation in Software Engineering, Berlin, Heidelberg: Springer Berlin Heidelberg.
+När användare väljer alternativ i menyn respektive metod kommer det att köras.
+
+     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        ....
+        if (id == R.id.action_external_web) {
+           ....
+            showExternalWebPage();
+            return true;
+        }
+
+        if (id == R.id.action_internal_web) {
+            ....
+            showInternalWebPage();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+Skärmdumpar:
+
+1. External URL ![](externalURL.png)
+
+2. Internal URL ![](internalURL.png)
+
+
